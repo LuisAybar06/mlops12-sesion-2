@@ -54,7 +54,7 @@ jobs:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}  # Define el ID del proyecto como variable local
       run: |  # Ejecuta los siguientes comandos en un shell
         # Despliega la imagen en Cloud Run
-        gcloud run deploy $IMAGE_NAME \
+        gcloud run deploy test \
           --image us-central1-docker.pkg.dev/$GOOGLE_PROJECT/images/$IMAGE_NAME:latest \
           --platform managed \
           --region us-central1 \
