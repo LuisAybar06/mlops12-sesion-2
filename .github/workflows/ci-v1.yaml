@@ -1,6 +1,5 @@
 name: CI
 
-
 on:
   push:
     branches:
@@ -19,6 +18,12 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Run Test
+      - name: Venv Enviroment
         run: |
-          python -m unittest test/test_main.py
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Run tests
+        run: |
+          source venv/bin/activate
+          python -m unittest tests/test_main_v1.py
