@@ -1,2 +1,12 @@
 flake8
 mypy
+nbformat
+nbconvert
+radon
+
+
+##
+fastapi
+uvicorn
+pandas
+joblib

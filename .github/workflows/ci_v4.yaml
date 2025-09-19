@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+      - feature/**
+  pull_request:
+    branches:
+      - main
 
 jobs:
   test:
@@ -18,18 +22,14 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Install requirements
+      - name: Install dependencies
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
 
-      - name: Run flake8
+      #custom_linter_v2
+      - name: Run custom linter
         run: |
           source venv/bin/activate
-          flake8 my_app main_v1_1.py 
-
-      - name: Run flake8
-        run: |
-          source venv/bin/activate
-          mypy my_app --config-file mypy.ini 
+          python custom_linter_v2.py my_app tests --max-line-length 88 --max-args 1 

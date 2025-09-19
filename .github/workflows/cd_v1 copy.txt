@@ -1,0 +1,62 @@
+# Nombre del flujo de trabajo, útil para identificarlo en GitHub Actions
+name: Build and Deploy Python Image to Google Cloud Run
+
+# Define cuándo debe ejecutarse este flujo de trabajo
+on:
+  push:  # Se activará en eventos de push
+    branches:  # Específicamente, cuando el push sea en las siguientes ramas
+    - 'main'  # Solo en la rama principal
+
+# Definición de los trabajos del flujo de trabajo
+jobs:
+  deploy:
+    # Especifica en qué tipo de máquina se ejecutará el trabajo
+    runs-on: ubuntu-latest  # Utiliza la última versión de Ubuntu
+
+    # Variables de entorno disponibles para todas las tareas dentro del trabajo
+    env:
+      IMAGE_NAME: fastapi  # Nombre de la imagen Docker que se construirá
+      PROJECT_ID: ${{ secrets.GOOGLE_PROJECT }}  # ID del proyecto GCP, almacenado como secreto
+
+    # Pasos del flujo de trabajo
+    steps:
+
+    # Paso 1: Clonar el repositorio en la máquina de GitHub Actions
+    - name: code checkout  # Nombre descriptivo del paso
+      uses: actions/checkout@v2  # Acción predefinida de GitHub para clonar el repositorio
+
+    # Paso 2: Instalar la CLI de Google Cloud
+    - name: install the gcloud cli  # Nombre descriptivo del paso
+      uses: google-github-actions/setup-gcloud@v0  # Acción para configurar gcloud
+      with:
+        project_id: ${{ secrets.GOOGLE_PROJECT }}  # Especifica el proyecto GCP
+        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}  # Clave de la cuenta de servicio
+        install_components: 'gke-gcloud-auth-plugin'  # Instala el complemento para autenticar con GKE
+        export_default_credentials: true  # Exporta las credenciales como predeterminadas para otros comandos
+
+    # Paso 3: Construir y publicar la imagen Docker en Artifact Registry o Google Container Registry
+    - name: build and push the docker image  # Nombre descriptivo del paso
+      env:
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}  # Define el ID del proyecto como variable local
+      run: |  # Ejecuta los siguientes comandos en un shell
+        # Configura Docker para autenticar con Artifact Registry (o GCR)
+        gcloud auth configure-docker us-central1-docker.pkg.dev
+
+        # Construye una imagen Docker con la etiqueta especificada
+        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/images/$IMAGE_NAME:latest .
+        
+        # Publica la imagen Docker en Artifact Registry o Google Container Registry
+        docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/images/$IMAGE_NAME:latest
+
+    # Paso 4: Desplegar la imagen Docker en Cloud Run
+    - name: deploy to Cloud Run  # Nombre descriptivo del paso
+      env:
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}  # Define el ID del proyecto como variable local
+      run: |  # Ejecuta los siguientes comandos en un shell
+        # Despliega la imagen en Cloud Run
+        gcloud run deploy $IMAGE_NAME \
+          --image us-central1-docker.pkg.dev/$GOOGLE_PROJECT/images/$IMAGE_NAME:latest \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --project $GOOGLE_PROJECT
