@@ -28,8 +28,7 @@ jobs:
           source venv/bin/activate
           pip install -r requirements.txt
 
-      #custom_linter_v2
       - name: Run custom linter
         run: |
           source venv/bin/activate
-          python custom_linter_v2.py my_app tests --max-line-length 88 --max-args 1 
+          python custom_linter_input_varaibles.py my_app tests --max-line-length 88 --max-args 1 

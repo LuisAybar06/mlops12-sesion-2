@@ -24,8 +24,7 @@ jobs:
           source venv/bin/activate
           pip install -r requirements.txt
 
-      #custom_linter_v3
       - name: Run custom linters
         run: |
           source venv/bin/activate
-          python custom_linter_v3.py my_app --max-line-length 88
+          python custom_linter_noteboock.py my_app --max-line-length 88
