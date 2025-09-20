@@ -1,0 +1,49 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: fastapi
+      PROJECT_ID: ${{ secrets.GOOGLE_PROJECT }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+
+      - name: install cli google cloud
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.GOOGLE_PROJECT }}
+          service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENCIALS }}
+          install_components: 'gke-gcloud-auth-plugin'
+          export_default_credencials: true
+
+      - name: build and push the docker image
+        env:
+          GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+
+          docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/images/$IMAGE_NAME:latest .
+
+          docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/images/$IMAGE_NAME:latest
+
+
+      - name: deploy to cloud run
+        env:
+          GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        run: |
+          gcloud run deploy test \
+            --image us-central1-docker.pkg.dev/$GOOGLE_PROJECT/images/$IMAGE_NAME:latest \
+            --platform manage \
+            --region us-central1 \
+            --allow-unauthentificated
+            --project $GOOGLE_PROJECT
