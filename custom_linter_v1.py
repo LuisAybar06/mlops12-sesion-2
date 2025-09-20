@@ -23,7 +23,6 @@ def check_black (file_path):
                 elif re.match(r'^\s*', lines[i-3]):
                     print(f"{file_path}:{i+1}: Too many line befone block definition")
                     errors += 1
-
     return errors
 
 
@@ -33,7 +32,7 @@ def lint_directory(directory):
 
     for root, _, files in os.walk(directory):
         for file in files:
-            if file.endswitch('.py'):
+            if file.endswith('.py'):
                 file_path = os.path.join(root, file)
                 total_error += check_black(file_path)
 
