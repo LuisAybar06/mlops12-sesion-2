@@ -45,5 +45,5 @@ jobs:
             --image us-central1-docker.pkg.dev/$GOOGLE_PROJECT/images/$IMAGE_NAME:latest \
             --platform manage \
             --region us-central1 \
-            --allow-unauthentificated
+            --allow-unauthentificated \
             --project $GOOGLE_PROJECT
