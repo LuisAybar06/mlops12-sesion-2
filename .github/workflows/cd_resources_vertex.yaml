@@ -36,13 +36,13 @@ jobs:
           cd terraform_vertex
           terraform init
 
-    #   - name: Apply Terraform
-    #     run: |
-    #       cd terraform_vertex
-    #       terraform apply -auto-approve
-
-          
-      - name: Destroy Terraform
+      - name: Apply Terraform
         run: |
           cd terraform_vertex
-          terraform destroy -auto-approve
+          terraform apply -auto-approve
+
+          
+    #   - name: Destroy Terraform
+    #     run: |
+    #       cd terraform_vertex
+    #       terraform destroy -auto-approve
