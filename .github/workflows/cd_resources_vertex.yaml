@@ -40,3 +40,9 @@ jobs:
         run: |
           cd terraform_vertex
           terraform apply -auto-approve
+
+          
+    #   - name: Destroy Terraform
+    #     run: |
+    #       cd terraform_vertex
+    #       terraform destroy -auto-approve

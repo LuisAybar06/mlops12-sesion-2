@@ -1,55 +1,66 @@
 provider "google" {
   project = var.project_id
-  region  = "us-central1"
-}
-
-resource "google_bigquery_dataset" "dataset_v1"{
-    dataset_id = var.dataset_id
-    project = var.project_id
-    location = "us-central1"
+  region  = var.region
 }
 
 
-resource "google_bigquery_table" "table_v1"{
-    table_id = var.table_id
-    dataset_id = var.dataset_id
-    project = var.project_id
+resource "google_bigquery_dataset" "dataset" {
+  dataset_id = var.dataset_id
+  project    = var.project_id
+  location   = var.region
+}
+ 
 
-    schema = jsonencode([
-        {
-            name="age",
-            type="INTEGER"
-            mode="REQUIRED"
-        },
-        {
-            name="workclass",
-            type="STRING"
-            mode="REQUIRED"
-        },
-        {
-            name="occupation",
-            type="STRING"
-            mode="REQUIRED"
-        }
-    ])
+resource "google_bigquery_table" "table1" {
+  table_id   = var.table_id
+  dataset_id = google_bigquery_dataset.dataset.dataset_id
+  project    = var.project_id
+
+  schema = jsonencode([
+    {
+      name = "age"
+      type = "INTEGER"
+      mode = "REQUIRED"
+    },
+    {
+      name = "workclass"
+      type = "STRING"
+      mode = "NULLABLE"
+    },
+    {
+      name = "occupation"
+      type = "STRING"
+      mode = "NULLABLE"
+    }
+  ])
 }
 
 
+resource "google_bigquery_dataset_iam_binding" "dataset_access_editor" {
+  dataset_id = google_bigquery_table.table1.dataset_id
+  project    = google_bigquery_table.table1.project
 
-resource "google_bigquery_dataset_iam_binding" "dataset_acces"{
-    dataset_id = var.dataset_id
-    project = var.project_id
+  role    = "roles/bigquery.dataEditor"
+  members = [
+    "serviceAccount:mlops-process@mlops12-469915.iam.gserviceaccount.com"
+  ]
+}
 
-    role = "roles/bigquery.dataViewer"
-    members = [
-        "serviceAccount:mlops-process@mlops12-469915.iam.gserviceaccount.com"
-    ]
+
+resource "google_bigquery_dataset_iam_binding" "dataset_access_viewer" {
+  dataset_id = google_bigquery_table.table1.dataset_id
+  project    = google_bigquery_table.table1.project
+
+  role    = "roles/bigquery.dataViewer"
+  members = [
+    "serviceAccount:mlops-process@mlops12-469915.iam.gserviceaccount.com"
+  ]
 }
 
 
 resource "google_bigquery_routine" "cencus_filter_by_age" {
   routine_id = var.routine_id
-  dataset_id = var.dataset_id
+  dataset_id = google_bigquery_dataset.dataset.dataset_id
   project    = var.project_id
 
   definition_body = <<-SQL
