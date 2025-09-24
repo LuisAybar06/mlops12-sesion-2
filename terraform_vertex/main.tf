@@ -13,7 +13,7 @@ resource "google_bigquery_dataset" "dataset_v1"{
 
 resource "google_bigquery_table" "table_v1"{
     table_id = var.table_id
-    dataset_id = google_bigquery_dataset.dataset_v1.dataset_id
+    dataset_id = var.dataset_id
     project = var.project_id
 
     schema = jsonencode([
