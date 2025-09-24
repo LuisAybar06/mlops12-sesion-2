@@ -1,0 +1,9 @@
+CREATE OR REPLACE PROCEDURE `trim-odyssey-390415.laybarm_demo.cencus_filter_by_age`(input_age INT64)
+BEGIN
+
+  INSERT INTO `trim-odyssey-390415.laybarm_demo.census_by_age`
+  SELECT age, workclass, occupation
+  FROM `bigquery-public-data.ml_datasets.census_adult_income`
+  WHERE age < input_age;
+
+END;

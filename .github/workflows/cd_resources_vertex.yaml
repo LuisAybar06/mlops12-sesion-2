@@ -1,0 +1,49 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: fastapi
+      PROJECT_ID: ${{ secrets.GOOGLE_PROJECT }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+
+      - name: install cli google cloud
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.GOOGLE_PROJECT }}
+          service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENCIALS }}
+          install_components: 'gke-gcloud-auth-plugin'
+          export_default_credencials: true
+
+          
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform-version: 1.0.0
+
+      - name: Inicializar terraform
+        run: |
+          cd terraform_vertex
+          terraform init
+
+      - name: aplicar terraform
+        run: |
+          cd terraform_vertex
+          terraform apply -auto-approve
