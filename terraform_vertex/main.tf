@@ -6,7 +6,7 @@ provider "google" {
 
 resource "google_bigquery_dataset" "dataset_v1"{
     dataset_id = var.dataset_id
-    project = var.project
+    project = var.project_id
     location = var.location
 }
 
@@ -14,7 +14,7 @@ resource "google_bigquery_dataset" "dataset_v1"{
 resource "google_bigquery_table" "table_v1"{
     table_id = var.table_id
     dataset_id = google_bigquery_dataset.dataset_v1.dataset_id
-    project = var.project
+    project = var.project_id
 
     schema = jsonencode([
         {
@@ -39,7 +39,7 @@ resource "google_bigquery_table" "table_v1"{
 
 resource "google_bigquery_dataset_iam_binding" "dataset_acces"{
     dataset_id = var.dataset_id
-    project = var.project
+    project = var.project_id
 
     role = "roles/bigquery.dataViewer"
     members = [
