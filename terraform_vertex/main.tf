@@ -1,12 +1,12 @@
 provider "google" {
   project = var.project_id
-  region  = var.region
+  region  = "us-central1"
 }
 
 resource "google_bigquery_dataset" "dataset_v1"{
     dataset_id = var.dataset_id
     project = var.project_id
-    location = var.region
+    location = "us-central1"
 }
 
 
